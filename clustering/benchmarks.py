@@ -3,7 +3,8 @@ import string
 from statistics import mean, stdev
 from time import perf_counter
 
-from clustering.algorithms import ALGORITHMS, perform_clustering
+from clustering.algorithms import ALGORITHMS
+from clustering.similarity import compute_similarity_matrix
 
 
 def generate_benchmark_sequences(
@@ -54,14 +55,17 @@ def benchmark_clustering_functions(similarity_fn, n_trials: int = 5) -> list[dic
     """
     results = []
     sequences = generate_benchmark_sequences()
-    n_sequences = len(sequences)
+    print("pre-calculating distance matrix")
+    similarity_matrix = compute_similarity_matrix(sequences, similarity_fn)
+    distance_matrix = 1 - similarity_matrix
 
     for algorithm in ALGORITHMS:
-        params = algorithm["optimum_params"] | {"similarity_fn": similarity_fn}
+        print(f"testing {algorithm['name']}")
+        params = {k: v for k, v in algorithm["optimum_params"].items() if k != "similarity_fn"}
         trial_times = []
         for _ in range(n_trials):
             start_time = perf_counter()
-            perform_clustering(sequences, algorithm["class"], params)
+            algorithm["class"](metric="precomputed", **params).fit_predict(distance_matrix)
             elapsed = perf_counter() - start_time
             trial_times.append(elapsed)
 
@@ -71,7 +75,7 @@ def benchmark_clustering_functions(similarity_fn, n_trials: int = 5) -> list[dic
                 "algorithm": algorithm["name"],
                 "mean time": mean(trial_times),
                 "standard deviation": stdev(trial_times) if n_trials > 1 else 0,
-                "sequences per second": n_sequences / mean(trial_times),
+                "sequences per second": len(sequences) / mean(trial_times),
             }
         )
 
