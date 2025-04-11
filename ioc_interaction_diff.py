@@ -37,39 +37,18 @@ Notes:
 import json
 import sys
 
-
-def load_data(file_name):
-    with open(file_name, "r") as f:
-        data = json.load(f)["iocs"]
-        # filter out IoCs that were payload requests
-        data = [ioc for ioc in data if ioc["scanner"]]
-    return data
-
+from greedybear_utils import calculate_interaction_delta, read_dump
 
 *_, file_a, file_b, out_file_name = sys.argv
 
-a, b = load_data(file_a), load_data(file_b)
+a, b = read_dump(file_a), read_dump(file_b)
 date_a = max(row["last_seen"] for row in a)
 date_b = max(row["last_seen"] for row in b)
 assert date_a < date_b
 
-# build a mapping from IoC to its cumulated interaction count including day A
-ips_in_a = {ioc["value"]: ioc["interaction_count"] for ioc in a}
-result = {}
-for ioc in b:
-    # ignore IoCs that were not seen on day B
-    if ioc["last_seen"] < date_b:
-        continue
-    # ignore IoCs that do not have an IP address
-    # this happend sometimes due to a bug in GreedyBear
-    if ioc["value"] == "":
-        continue
-    # filter out IoCs that were payload requests
-    if not ioc["scanner"]:
-        continue
-    # save the number of interactions on day B that an IoC was responsible for
-    result[ioc["value"]] = ioc["interaction_count"] - ips_in_a.get(ioc["value"], 0)
+result = calculate_interaction_delta(a, date_a, b)
 
 # write result
+print(f"writing {len(result)} records to {out_file_name}")
 with open(out_file_name, "w") as file:
     json.dump({"iocs": result, "date": date_b}, file)
