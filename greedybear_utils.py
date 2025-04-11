@@ -31,6 +31,28 @@ def read_dump(file_path: str, only_scanners: bool = True, exclude_mass_scanners:
     return data
 
 
+def read_delta_file(file_path: str) -> tuple[dict, str]:
+    """
+    Read a previously created delta file.
+
+    This function loads data from a specified JSON file
+    that was previously created by the create_delta_file.py script.
+
+    Args:
+        file_path (str): Path to the JSON file containing the data.
+
+    Returns:
+        tuple[dict, str]: Mapping from IP addresses to their number of interactions
+                          and the date of the day the data was recorded.
+    """
+    print("reading", file_path)
+    with open(file_path, "r") as file:
+        content = json.load(file)
+    data, date = content["iocs"], content["date"]
+    print(f"got {len(data)} records")
+    return data, date
+
+
 def calculate_interaction_delta(baseline: list[dict], baseline_date: str, recent: list[dict]) -> defaultdict[str, int]:
     """
     Calculate the change in interaction counts for IOCs seen after a specified date.
