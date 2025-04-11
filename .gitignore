@@ -1,4 +1,6 @@
+.joblib/
 venv/
 __pycache__/
+catboost_info/
 *.json
 *.txt
