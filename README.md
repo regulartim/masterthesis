@@ -51,4 +51,4 @@ Key findings of this research include:
 - Regressor/ranker models achieve superior interaction-based recall
 - DBSCAN clustering with Jaccard similarity provides a good alance of accuracy and computational efficiency for identifying attack patterns
 
-The implemented techniques significantly outperform existing GreedyBear feed generation mechanisms.
+The implemented techniques significantly outperform existing GreedyBear feed generation mechanisms and are already [in operation](https://greedybear.honeynet.org/).
