@@ -146,17 +146,21 @@ def run():
     if config["prioritize_new"]:
         csv_df = load_csv(config["prioritize_new"])
         csv_df["interactions_on_eval_day"] = csv_df["value"].map(lambda ip: interaction_delta[ip])
-        feeds["AIP Prioritize New"] = Feed("AIP Prioritize New", data=csv_df, size=config["feed_size"], sort_key="score", eval_ips=interaction_delta)
+        feeds["AIP Prioritize New"] = Feed(
+            "AIP Prioritize New", data=csv_df, size=config["feed_size"], sort_key="score", eval_ips=interaction_delta, coa_scores=coa_scores
+        )
     if config["prioritize_consistent"]:
         csv_df = load_csv(config["prioritize_consistent"])
         csv_df["interactions_on_eval_day"] = csv_df["value"].map(lambda ip: interaction_delta[ip])
         feeds["AIP Prioritize Consistent"] = Feed(
-            "AIP Prioritize Consistent", data=csv_df, size=config["feed_size"], sort_key="score", eval_ips=interaction_delta
+            "AIP Prioritize Consistent", data=csv_df, size=config["feed_size"], sort_key="score", eval_ips=interaction_delta, coa_scores=coa_scores
         )
     if config["abuseipdb"]:
         adb_df = load_txt(config["abuseipdb"])
         adb_df["interactions_on_eval_day"] = adb_df["value"].map(lambda ip: interaction_delta[ip])
-        feeds["AbuseIPDB Blocklist"] = Feed("AbuseIPDB Blocklist", data=adb_df, size=config["feed_size"], sort_key="score", eval_ips=interaction_delta)
+        feeds["AbuseIPDB Blocklist"] = Feed(
+            "AbuseIPDB Blocklist", data=adb_df, size=config["feed_size"], sort_key="score", eval_ips=interaction_delta, coa_scores=coa_scores
+        )
 
     print("evaluating")
     if config["test_sizes_up_to"]:
