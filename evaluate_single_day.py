@@ -9,7 +9,7 @@ from greedybear_utils import calculate_interaction_delta, read_delta_file, read_
 from models.base_model import Model
 from models.feed import Feed
 from models.model_definitions import MODEL_DEFINITIONS
-from models.utils import get_features, load_csv, load_txt, plot
+from models.utils import get_features, load_coa_data, load_csv, load_txt, plot
 
 
 def run():
@@ -50,7 +50,12 @@ def run():
     parser.add_argument(
         "-a",
         "--abuseipdb",
-        help="Path to the .txt file containing the abuseipdb feed.",
+        help="Path to the .txt file containing the abuseipdb blocklist.",
+    )
+
+    parser.add_argument(
+        "--coa",
+        help="Path to the .json file containing the 'confidence of abuse' scores.",
     )
 
     parser.add_argument(
@@ -111,6 +116,11 @@ def run():
         interaction_delta = calculate_interaction_delta(scoring_data, scoring_data_date, evaluation_data)
     print(f"evaluation data is from {evaluation_data_date}")
 
+    coa_scores = None
+    if config["coa"]:
+        print("loading confidence of abuse data")
+        coa_scores = load_coa_data(config["coa"])
+
     print("extracting features")
     scoring_df = get_features(scoring_data, scoring_data_date)
     scoring_df["interactions_on_eval_day"] = scoring_df["value"].map(lambda ip: interaction_delta[ip])
@@ -124,7 +134,10 @@ def run():
     print("creating feeds")
     three_days_ago = (date.fromisoformat(scoring_data_date) - timedelta(days=3)).isoformat()
     two_weeks_ago = (date.fromisoformat(scoring_data_date) - timedelta(days=14)).isoformat()
-    feeds = {model.name: Feed(model.name, data=scoring_df, size=config["feed_size"], sort_key=model.sort_key, eval_ips=interaction_delta) for model in models}
+    feeds = {
+        model.name: Feed(model.name, data=scoring_df, size=config["feed_size"], sort_key=model.sort_key, eval_ips=interaction_delta, coa_scores=coa_scores)
+        for model in models
+    }
 
     if "Recent (GreedyBear)" in feeds:
         feeds["Recent (GreedyBear)"].exclude(scoring_df["last_seen"] < three_days_ago)

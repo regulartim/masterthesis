@@ -332,6 +332,7 @@ def plot(models: list, df: pd.DataFrame, ref_date: str, eval_date: str, percenta
                     "Interaction recall": "Interaction-based recall@k",
                     "IP recall": "IP-based recall@k",
                     "IP F1 score": "IP-based F1 score",
+                    "Average COA score": "Average COA score",
                 }[metric],
             },
             color="feed",
