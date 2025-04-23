@@ -1,3 +1,4 @@
+import json
 import sys
 from datetime import date
 from functools import cache
@@ -117,6 +118,29 @@ def get_features(iocs: list[dict], reference_day: str) -> pd.DataFrame:
     df = pd.DataFrame(result)
     correlation_analysis(df, list(result[0].keys())[FEATURES_OFFSET:])
     return df
+
+
+def load_coa_data(file_path: str) -> dict:
+    """
+    Load and process Confidence of Abuse (CoA) data from a JSON file.
+
+    This function reads a JSON file containing abuse confidence scores and
+    extracts each score into a flattened dictionary format.
+
+    Args:
+        file_path (str): Path to the JSON file containing CoA data
+
+    Returns:
+        dict: A dictionary mapping IPs to their
+              corresponding abuse confidence scores
+    """
+    with open(file_path) as f:
+        j = json.load(f)
+    coa_data = {}
+    for elem in j:
+        for k, v in elem.items():
+            coa_data[k] = v["abuseConfidenceScore"]
+    return coa_data
 
 
 def load_csv(file_path: str) -> pd.DataFrame:
