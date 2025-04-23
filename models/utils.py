@@ -346,7 +346,7 @@ def plot(models: list, df: pd.DataFrame, ref_date: str, eval_date: str, percenta
         )
         fig.update_layout(xaxis_tickformat="digits")
 
-        out_path = f"size_recall_{ref_date}_{eval_date}_{metric}.html"
+        out_path = "./data_out/" + f"{ref_date}_{eval_date}_{metric}.html"
         fig.write_html(out_path)
 
         with open(out_path, "a") as f:
