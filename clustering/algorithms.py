@@ -7,12 +7,44 @@ from sklearn.metrics.cluster import rand_score
 
 ALGORITHMS = [
     {
-        "name": "Agglomerative Clustering",
+        "name": "Agglomerative Clustering (average linkage)",
         "class": AgglomerativeClustering,
         "param_searchspace": {
             "similarity_fn": [jaccard_similarity, ratcliff_obershelp_similarity],
             "distance_threshold": np.linspace(0, 1, 100, endpoint=False),
-            "linkage": ["complete", "average", "single"],
+            "linkage": ["average"],
+            "n_clusters": [None],
+        },
+        "optimum_params": {
+            "similarity_fn": jaccard_similarity,
+            "distance_threshold": 0.56,
+            "linkage": "average",
+            "n_clusters": None,
+        },
+    },
+    {
+        "name": "Agglomerative Clustering (complete linkage)",
+        "class": AgglomerativeClustering,
+        "param_searchspace": {
+            "similarity_fn": [jaccard_similarity, ratcliff_obershelp_similarity],
+            "distance_threshold": np.linspace(0, 1, 100, endpoint=False),
+            "linkage": ["complete"],
+            "n_clusters": [None],
+        },
+        "optimum_params": {
+            "similarity_fn": jaccard_similarity,
+            "distance_threshold": 0.57,
+            "linkage": "complete",
+            "n_clusters": None,
+        },
+    },
+    {
+        "name": "Agglomerative Clustering (single linkage)",
+        "class": AgglomerativeClustering,
+        "param_searchspace": {
+            "similarity_fn": [jaccard_similarity, ratcliff_obershelp_similarity],
+            "distance_threshold": np.linspace(0, 1, 100, endpoint=False),
+            "linkage": ["single"],
             "n_clusters": [None],
         },
         "optimum_params": {
