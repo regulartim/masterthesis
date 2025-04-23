@@ -222,5 +222,5 @@ def run():
     pd.DataFrame(out_data).to_csv("./data_out/eval_results.csv", index=False)
 
 
-if __name__ == "main":
+if __name__ == "__main__":
     run()
